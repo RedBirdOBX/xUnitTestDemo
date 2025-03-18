@@ -1,6 +1,5 @@
 ﻿using EmployeeManagement.Business;
 using EmployeeManagement.DataAccess.Entities;
-using Newtonsoft.Json.Serialization;
 
 namespace EmployeeManagement.Test
 {
