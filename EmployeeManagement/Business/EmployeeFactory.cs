@@ -10,27 +10,21 @@ namespace EmployeeManagement.Business
         /// <summary>
         /// Create an employee
         /// </summary>
-        public virtual Employee CreateEmployee(string firstName,
-            string lastName,
-            string? company = null,
-            bool isExternal = false)
+        public virtual Employee CreateEmployee(string firstName, string lastName, string? company = null, bool isExternal = false)
         {
             if (string.IsNullOrEmpty(firstName))
             {
-                throw new ArgumentException($"'{nameof(firstName)}' cannot be null or empty.",
-                    nameof(firstName));
+                throw new ArgumentException($"'{nameof(firstName)}' cannot be null or empty.", nameof(firstName));
             }
 
             if (string.IsNullOrEmpty(lastName))
             {
-                throw new ArgumentException($"'{nameof(lastName)}' cannot be null or empty.",
-                    nameof(lastName));
+                throw new ArgumentException($"'{nameof(lastName)}' cannot be null or empty.", nameof(lastName));
             }
 
             if (company == null && isExternal)
             {
-                throw new ArgumentException($"'{nameof(company)}' cannot be null or empty when the employee is external.",
-                    nameof(company));
+                throw new ArgumentException($"'{nameof(company)}' cannot be null or empty when the employee is external.", nameof(company));
             }
 
             if (isExternal)

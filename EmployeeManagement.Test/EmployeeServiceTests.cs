@@ -1,4 +1,7 @@
 ﻿using EmployeeManagement.Business;
+using EmployeeManagement.Business.EventArguments;
+using EmployeeManagement.Business.Exceptions;
+using EmployeeManagement.DataAccess.Entities;
 using EmployeeManagement.Services.Test;
 
 namespace EmployeeManagement.Test
@@ -68,6 +71,58 @@ namespace EmployeeManagement.Test
 
             // or
             Assert.All(internalEmployee.AttendedCourses, (course) => Assert.False(course.IsNew));
+        }
+
+        // testing with async
+        [Fact]
+        public async Task CreateInternalEmployee_InternalEmployeeCreated_AttendedCoursesMatchObligatoryCourses_Async()
+        {
+            var employeeRepo = new EmployeeManagementTestDataRepository();
+            var employeeService = new EmployeeService(employeeRepo, new EmployeeFactory());
+            var obligatoryCourses = await employeeRepo.GetCoursesAsync(_firstCourseId, _secondCourseId);
+            var internalEmployee = await employeeService.CreateInternalEmployeeAsync("Megan", "Jones");
+
+            // list to search thru , predicate
+            Assert.Equal(obligatoryCourses, internalEmployee.AttendedCourses);
+        }
+
+        // EXCEPTION TESTING //
+        [Fact]
+        public async Task GiveRaise_RaiseBelowMinimumGiven_EmployeeInvalidRaiseExceptionMustBeThrown_Async()
+        {
+            var employeeService = new EmployeeService(new EmployeeManagementTestDataRepository(), new EmployeeFactory());
+            var internalEmployee = new InternalEmployee("Ricky", "Bobby", 5, 3000, false, 1);
+
+            await Assert.ThrowsAsync<EmployeeInvalidRaiseException>(async () =>
+                await employeeService.GiveRaiseAsync(internalEmployee, 50));
+        }
+
+        // common mistake - not awaiting gives false positive
+        [Fact]
+        public void GiveRaise_RaiseBelowMinimumGiven_EmployeeInvalidRaiseExceptionMustBeThrown_Mistake()
+        {
+            var employeeService = new EmployeeService(new EmployeeManagementTestDataRepository(), new EmployeeFactory());
+            var internalEmployee = new InternalEmployee("Ricky", "Bobby", 5, 3000, false, 1);
+
+            Assert.ThrowsAsync<EmployeeInvalidRaiseException>(async () =>
+                await employeeService.GiveRaiseAsync(internalEmployee, 50));
+        }
+
+        // EVENT TESTING //
+        [Fact]
+        public void NotifyOfAbsence_EmployeeIsAbsent_OnEmployeeIsAbsentMustBeTriggered() 
+        { 
+            var employeeService = new EmployeeService(new EmployeeManagementTestDataRepository(), new EmployeeFactory());
+            var internalEmployee = new InternalEmployee("Ricky", "Bobby", 5, 3000, false, 1);
+
+            // accept 3 functions:
+            // 1 - to attach an event handler
+            // 2 - to detach event handler
+            // 3 - code that actually raises the event
+            Assert.Raises<EmployeeIsAbsentEventArgs>(
+                handler => employeeService.EmployeeIsAbsent += handler, 
+                handler => employeeService.EmployeeIsAbsent -= handler,
+                () => employeeService.NotifyOfAbsence(internalEmployee));
         }
     }
 }

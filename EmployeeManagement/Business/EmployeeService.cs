@@ -1,13 +1,13 @@
 ﻿using EmployeeManagement.Business.EventArguments;
 using EmployeeManagement.Business.Exceptions;
 using EmployeeManagement.DataAccess.Entities;
-using EmployeeManagement.DataAccess.Services; 
+using EmployeeManagement.DataAccess.Services;
 
 namespace EmployeeManagement.Business
 {
     public class EmployeeService : IEmployeeService
     {
-        // Ids of obligatory courses: "Company Introduction" and "Respecting Your Colleagues" 
+        // Ids of obligatory courses: "Company Introduction" and "Respecting Your Colleagues"
         private Guid[] _obligatoryCourseIds = {
             Guid.Parse("37e03ca7-c730-4351-834c-b66f280cdb01"),
             Guid.Parse("1fd115cf-f44c-4982-86bc-a8fe2e4ff83e") };
@@ -17,15 +17,13 @@ namespace EmployeeManagement.Business
 
         public event EventHandler<EmployeeIsAbsentEventArgs>? EmployeeIsAbsent;
 
-        public EmployeeService(IEmployeeManagementRepository repository,
-            EmployeeFactory employeeFactory)
+        public EmployeeService(IEmployeeManagementRepository repository, EmployeeFactory employeeFactory)
         {
             _repository = repository;
             _employeeFactory = employeeFactory;
         }
 
-        public async Task AttendCourseAsync(InternalEmployee employee,
-            Course attendedCourse)
+        public async Task AttendCourseAsync(InternalEmployee employee, Course attendedCourse)
         {
             var alreadyAttendedCourse = employee.AttendedCourses
                 .Any(c => c.Id == attendedCourse.Id);
@@ -35,13 +33,13 @@ namespace EmployeeManagement.Business
                 return;
             }
 
-            // add course 
+            // add course
             employee.AttendedCourses.Add(attendedCourse);
 
-            // save changes 
+            // save changes
             await _repository.SaveChangesAsync();
 
-            // execute business logic: when a course is attended, 
+            // execute business logic: when a course is attended,
             // the suggested bonus must be recalculated
             employee.SuggestedBonus = employee.YearsInService
                 * employee.AttendedCourses.Count * 100;
@@ -64,10 +62,10 @@ namespace EmployeeManagement.Business
                 throw new EmployeeInvalidRaiseException(
                     "Invalid raise: raise must be higher than or equal to 100.", raise);
                 //throw new Exception(
-                //  "Invalid raise: raise must be higher than or equal to 100."); 
+                  //"Invalid raise: raise must be higher than or equal to 100.");
             }
 
-            // if minimum raise was previously given, the raise must 
+            // if minimum raise was previously given, the raise must
             // be higher than the minimum raise
             if (employee.MinimumRaiseGiven && raise == 100)
             {
@@ -124,18 +122,17 @@ namespace EmployeeManagement.Business
             return employee;
         }
 
-        public InternalEmployee CreateInternalEmployee(
-            string firstName, string lastName)
+        public InternalEmployee CreateInternalEmployee(string firstName, string lastName)
         {
-            // use the factory to create the object 
+            // use the factory to create the object
             var employee = (InternalEmployee)_employeeFactory.CreateEmployee(firstName, lastName);
 
-            // apply business logic 
+            // apply business logic
 
             // add obligatory courses attended by all new employees
             // during vetting process
 
-            // get those courses  
+            // get those courses
             var obligatoryCourses = _repository.GetCourses(_obligatoryCourseIds);
 
             // add them for this employee
@@ -149,18 +146,17 @@ namespace EmployeeManagement.Business
             return employee;
         }
 
-        public async Task<InternalEmployee> CreateInternalEmployeeAsync(
-           string firstName, string lastName)
+        public async Task<InternalEmployee> CreateInternalEmployeeAsync(string firstName, string lastName)
         {
-            // use the factory to create the object 
+            // use the factory to create the object
             var employee = (InternalEmployee)_employeeFactory.CreateEmployee(firstName, lastName);
 
-            // apply business logic 
-       
+            // apply business logic
+
             // add obligatory courses attended by all new employees
             // during vetting process
 
-            // get those courses  
+            // get those courses
             var obligatoryCourses = await _repository.GetCoursesAsync(_obligatoryCourseIds);
 
             // add them for this employee
@@ -174,10 +170,9 @@ namespace EmployeeManagement.Business
             return employee;
         }
 
-        public ExternalEmployee CreateExternalEmployee(
-            string firstName, string lastName, string company)
+        public ExternalEmployee CreateExternalEmployee(string firstName, string lastName, string company)
         {
-            // create a new external employee with default values 
+            // create a new external employee with default values
             var employee = (ExternalEmployee)_employeeFactory.CreateEmployee(
                 firstName, lastName, company, true);
 
@@ -193,8 +188,8 @@ namespace EmployeeManagement.Business
 
         public void NotifyOfAbsence(Employee employee)
         {
-            // Employee is absent.  Other parts of the application may 
-            // respond to this. Trigger the EmployeeIsAbsent event 
+            // Employee is absent.  Other parts of the application may
+            // respond to this. Trigger the EmployeeIsAbsent event
             // (via a virtual method so it can be overridden in subclasses)
             OnEmployeeIsAbsent(new EmployeeIsAbsentEventArgs(employee.Id));
         }
