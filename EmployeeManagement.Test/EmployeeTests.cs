@@ -1,9 +1,18 @@
 ﻿using EmployeeManagement.DataAccess.Entities;
+using Xunit.Abstractions;
 
 namespace EmployeeManagement.Test
 {
     public class EmployeeTests
     {
+        private readonly ITestOutputHelper _outputHelper;
+
+        public EmployeeTests(ITestOutputHelper outputHelper)
+        {
+            _outputHelper = outputHelper;
+        }
+
+
         [Fact]
         public void EmployeeFullNamePropertyGetter_InputFirstNameAndLastName_FullNameIsConcatenation()
         {
@@ -30,6 +39,19 @@ namespace EmployeeManagement.Test
         public void EmployeeFullNamePropertyGetter_InputFirstNameAndLastName_FullNameContactsPartOfConcatenation()
         {
             var employee = new InternalEmployee("John", "Doe", 1, 3000, false, 1);
+            Assert.Contains("ohn", employee.FullName, StringComparison.InvariantCultureIgnoreCase);
+        }
+
+        //[Fact(DisplayName = "EmployeeTests_SkipDemo_DisplayName", Skip = "description here", Timeout = 10000)]
+        [Fact]
+        public void EmployeeTests_SkipDemo()
+        {
+            var employee = new InternalEmployee("John", "Doe", 1, 3000, false, 1);
+
+            // here's how you can write output out to the Test.Output window.
+
+            _outputHelper.WriteLine("Hello World");
+
             Assert.Contains("ohn", employee.FullName, StringComparison.InvariantCultureIgnoreCase);
         }
     }

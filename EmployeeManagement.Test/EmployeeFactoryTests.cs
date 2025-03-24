@@ -9,6 +9,7 @@ namespace EmployeeManagement.Test
         private const int _maxSalaryRange = 3500;
 
         [Fact]
+        [Trait("Category","EmployeeFactory_CreateEmployee_Salary")]
         public void CreateEmployee_ConstructInternalEmployee_DefaultSalaryIsBetween2500And3500()
         {
             var factory = new EmployeeFactory();
@@ -17,6 +18,7 @@ namespace EmployeeManagement.Test
         }
 
         [Fact]
+        [Trait("Category","EmployeeFactory_CreateEmployee_Salary")]
         public void CreateEmployee_ConstructInternalEmployee_DefaultSalaryInRange()
         {
             var factory = new EmployeeFactory();
@@ -25,6 +27,7 @@ namespace EmployeeManagement.Test
         }
 
         [Fact]
+        [Trait("Category","EmployeeFactory_CreateEmployee_Salary")]
         public void CreateEmployee_ConstructInternalEmployee_DefaultSalaryIsBetween2500And3500_Precision()
         {
             var factory = new EmployeeFactory();
@@ -35,6 +38,7 @@ namespace EmployeeManagement.Test
 
         // OBJECT TYPES //
         [Fact]
+        [Trait("Category","EmployeeFactory_CreateEmployee_ReturnType")]
         public void CreateEmployee_IsExternalIsTrue_ReturnTypeMustBeExternalEmployee()
         {
             var employeeFactory = new EmployeeFactory();
@@ -43,6 +47,7 @@ namespace EmployeeManagement.Test
         }
 
         [Fact]
+        [Trait("Category","EmployeeFactory_CreateEmployee_ReturnType")]
         public void CreateEmployee_IsExternalIsTrue_ReturnTypeMustBeInternalEmployee()
         {
             var employeeFactory = new EmployeeFactory();

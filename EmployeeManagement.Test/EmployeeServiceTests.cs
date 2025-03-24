@@ -3,16 +3,34 @@ using EmployeeManagement.Business.EventArguments;
 using EmployeeManagement.Business.Exceptions;
 using EmployeeManagement.DataAccess.Entities;
 using EmployeeManagement.Services.Test;
+using EmployeeManagement.Test.Fixtures;
 
 namespace EmployeeManagement.Test
 {
-    public class EmployeeServiceTests
-    {
-        private Guid _firstCourseId = Guid.Parse("37e03ca7-c730-4351-834c-b66f280cdb01");
-        private Guid _secondCourseId = Guid.Parse("1fd115cf-f44c-4982-86bc-a8fe2e4ff83e");
+    // IClassFixture is used to share the same instance of the fixture class across all tests in the test class
+    // Instantiated before first test is fun and will auto-dispose once last test is run.
 
+    // expand...
+
+    [Collection("EmployeeServiceCollection")] // Collection Fixture Approach
+    public class EmployeeServiceTests //: IClassFixture<EmployeeServiceFixture>  commented out for Collection Fixture Approach
+    {
+        private readonly Guid _firstCourseId = Guid.Parse("37e03ca7-c730-4351-834c-b66f280cdb01");
+        private readonly Guid _secondCourseId = Guid.Parse("1fd115cf-f44c-4982-86bc-a8fe2e4ff83e");
+        private readonly EmployeeServiceFixture _employeeServiceFixture;
+
+        public EmployeeServiceTests(EmployeeServiceFixture employeeServiceFixture)
+        {
+            _employeeServiceFixture = employeeServiceFixture;
+        }
+
+
+        /// <summary>
+        /// Original test set up.  This version has a set up of the employee repo and employee service.
+        /// Building each test like this would be expensive. x seconds per implementation of the test data repo.
+        /// </summary>
         [Fact]
-        public void CreateInternalEmployee_InternalEmployeeCreated_MustHaveAttendedFirstObligatoryCourse_WithObject()
+        public void CreateInternalEmployee_InternalEmployeeCreated_MustHaveAttendedFirstObligatoryCourse_WithObject_Orig()
         {
             var employeeRepo = new EmployeeManagementTestDataRepository();
             var employeeService = new EmployeeService(employeeRepo, new EmployeeFactory());
@@ -22,13 +40,19 @@ namespace EmployeeManagement.Test
             Assert.Contains(obligatoryCourse, internalEmployee.AttendedCourses);
         }
 
+        [Fact]
+        public void CreateInternalEmployee_InternalEmployeeCreated_MustHaveAttendedFirstObligatoryCourse_WithObject()
+        {
+            var obligatoryCourse = _employeeServiceFixture.EmployeeManagementTestDataRepository.GetCourse(_firstCourseId);
+            var internalEmployee = _employeeServiceFixture.EmployeeService.CreateInternalEmployee("Megan", "Jones");
+            Assert.Contains(obligatoryCourse, internalEmployee.AttendedCourses);
+        }
+
         // slightly cleaner approach
         [Fact]
         public void CreateInternalEmployee_InternalEmployeeCreated_MustHaveAttendedFirstObligatoryCourse_WithPredicate()
         {
-            var employeeRepo = new EmployeeManagementTestDataRepository();
-            var employeeService = new EmployeeService(employeeRepo, new EmployeeFactory());
-            var internalEmployee = employeeService.CreateInternalEmployee("Megan", "Jones");
+            var internalEmployee = _employeeServiceFixture.EmployeeService.CreateInternalEmployee("Megan", "Jones");
 
             // list to search thru , predicate
             Assert.Contains(internalEmployee.AttendedCourses, (course) => course.Id == _firstCourseId);
@@ -37,9 +61,7 @@ namespace EmployeeManagement.Test
         [Fact]
         public void CreateInternalEmployee_InternalEmployeeCreated_MustHaveAttendedSecondObligatoryCourse_WithPredicate()
         {
-            var employeeRepo = new EmployeeManagementTestDataRepository();
-            var employeeService = new EmployeeService(employeeRepo, new EmployeeFactory());
-            var internalEmployee = employeeService.CreateInternalEmployee("Megan", "Jones");
+            var internalEmployee = _employeeServiceFixture.EmployeeService.CreateInternalEmployee("Megan", "Jones");
 
             // list to search thru , predicate
             Assert.Contains(internalEmployee.AttendedCourses, (course) => course.Id == _secondCourseId );
@@ -48,21 +70,20 @@ namespace EmployeeManagement.Test
         [Fact]
         public void CreateInternalEmployee_InternalEmployeeCreated_AttendedCoursesMatchObligatoryCourses()
         {
-            var employeeRepo = new EmployeeManagementTestDataRepository();
-            var employeeService = new EmployeeService(employeeRepo, new EmployeeFactory());
-            var obligatoryCourses = employeeRepo.GetCourses(_firstCourseId, _secondCourseId);
-            var internalEmployee = employeeService.CreateInternalEmployee("Megan", "Jones");
+            var obligatoryCourses = _employeeServiceFixture.EmployeeManagementTestDataRepository.GetCourses(_firstCourseId, _secondCourseId);
+            var internalEmployee = _employeeServiceFixture.EmployeeService.CreateInternalEmployee("Megan", "Jones");
 
             // list to search thru , predicate
             Assert.Equal(obligatoryCourses, internalEmployee.AttendedCourses);
         }
 
+        /// <summary>
+        /// Asserting on a collection of objects
+        /// </summary>
         [Fact]
         public void CreateInternalEmployee_InternalEmployeeCreated_AttendedCoursesMustNotBeNew()
         {
-            var employeeRepo = new EmployeeManagementTestDataRepository();
-            var employeeService = new EmployeeService(employeeRepo, new EmployeeFactory());
-            var internalEmployee = employeeService.CreateInternalEmployee("Megan", "Jones");
+            var internalEmployee = _employeeServiceFixture.EmployeeService.CreateInternalEmployee("Megan", "Jones");
 
             foreach (var course in internalEmployee.AttendedCourses)
             {
@@ -77,10 +98,8 @@ namespace EmployeeManagement.Test
         [Fact]
         public async Task CreateInternalEmployee_InternalEmployeeCreated_AttendedCoursesMatchObligatoryCourses_Async()
         {
-            var employeeRepo = new EmployeeManagementTestDataRepository();
-            var employeeService = new EmployeeService(employeeRepo, new EmployeeFactory());
-            var obligatoryCourses = await employeeRepo.GetCoursesAsync(_firstCourseId, _secondCourseId);
-            var internalEmployee = await employeeService.CreateInternalEmployeeAsync("Megan", "Jones");
+            var obligatoryCourses = await _employeeServiceFixture.EmployeeManagementTestDataRepository.GetCoursesAsync(_firstCourseId, _secondCourseId);
+            var internalEmployee = await _employeeServiceFixture.EmployeeService.CreateInternalEmployeeAsync("Megan", "Jones");
 
             // list to search thru , predicate
             Assert.Equal(obligatoryCourses, internalEmployee.AttendedCourses);
@@ -90,29 +109,26 @@ namespace EmployeeManagement.Test
         [Fact]
         public async Task GiveRaise_RaiseBelowMinimumGiven_EmployeeInvalidRaiseExceptionMustBeThrown_Async()
         {
-            var employeeService = new EmployeeService(new EmployeeManagementTestDataRepository(), new EmployeeFactory());
             var internalEmployee = new InternalEmployee("Ricky", "Bobby", 5, 3000, false, 1);
 
             await Assert.ThrowsAsync<EmployeeInvalidRaiseException>(async () =>
-                await employeeService.GiveRaiseAsync(internalEmployee, 50));
+                await _employeeServiceFixture.EmployeeService.GiveRaiseAsync(internalEmployee, 50));
         }
 
         // common mistake - not awaiting gives false positive
         [Fact]
         public void GiveRaise_RaiseBelowMinimumGiven_EmployeeInvalidRaiseExceptionMustBeThrown_Mistake()
         {
-            var employeeService = new EmployeeService(new EmployeeManagementTestDataRepository(), new EmployeeFactory());
             var internalEmployee = new InternalEmployee("Ricky", "Bobby", 5, 3000, false, 1);
 
             Assert.ThrowsAsync<EmployeeInvalidRaiseException>(async () =>
-                await employeeService.GiveRaiseAsync(internalEmployee, 50));
+                await _employeeServiceFixture.EmployeeService.GiveRaiseAsync(internalEmployee, 50));
         }
 
         // EVENT TESTING //
         [Fact]
-        public void NotifyOfAbsence_EmployeeIsAbsent_OnEmployeeIsAbsentMustBeTriggered() 
-        { 
-            var employeeService = new EmployeeService(new EmployeeManagementTestDataRepository(), new EmployeeFactory());
+        public void NotifyOfAbsence_EmployeeIsAbsent_OnEmployeeIsAbsentMustBeTriggered()
+        {
             var internalEmployee = new InternalEmployee("Ricky", "Bobby", 5, 3000, false, 1);
 
             // accept 3 functions:
@@ -120,9 +136,9 @@ namespace EmployeeManagement.Test
             // 2 - to detach event handler
             // 3 - code that actually raises the event
             Assert.Raises<EmployeeIsAbsentEventArgs>(
-                handler => employeeService.EmployeeIsAbsent += handler, 
-                handler => employeeService.EmployeeIsAbsent -= handler,
-                () => employeeService.NotifyOfAbsence(internalEmployee));
+                handler => _employeeServiceFixture.EmployeeService.EmployeeIsAbsent += handler,
+                handler => _employeeServiceFixture.EmployeeService.EmployeeIsAbsent -= handler,
+                () => _employeeServiceFixture.EmployeeService.NotifyOfAbsence(internalEmployee));
         }
     }
 }

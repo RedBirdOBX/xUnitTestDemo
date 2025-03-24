@@ -19,3 +19,11 @@ There are people who would suggest making those private methods public so they c
 If you really have to, you could change the visibility of the method you want to test from `private` to `internal` and set the `InternalsVisable` attribute in the assembly info file to the name of the test project assembly. Like that, our test project will have access to the internal methods.
 
 Still... not ideal.
+
+## Setting up Tests
+Constructor and Dispose - per test
+Class Fixture approach - share among all tests in the same class. SeeEmployeeServiceTests.
+Collection Fixture approach - share among all tests in the several test classes
+
+
+
