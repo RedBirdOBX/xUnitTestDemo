@@ -14,15 +14,15 @@ namespace EmployeeManagement.Test.HttpMessageHandlers
             _isEligibleForPromotion = isEligibleForPromotion;
         }
 
-        protected override Task<HttpResponseMessage> SendAsync(
-            HttpRequestMessage request, CancellationToken cancellationToken)
+        protected override Task<HttpResponseMessage> SendAsync( HttpRequestMessage request, CancellationToken cancellationToken)
         {
-            // 1 - Create the response
+            // 1 - Create the object that will be part of the response
             // this is that the response body is deserialized to.
             var promotionEligibilty = new PromotionEligibility()
             {
                 EligibleForPromotion = _isEligibleForPromotion
             };
+
             //snippet from PromotionService
             //// deserialize content
             //var content = await response.Content.ReadAsStringAsync();
