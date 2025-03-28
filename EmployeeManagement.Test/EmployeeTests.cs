@@ -42,7 +42,6 @@ namespace EmployeeManagement.Test
             Assert.Contains("ohn", employee.FullName, StringComparison.InvariantCultureIgnoreCase);
         }
 
-        //[Fact(DisplayName = "EmployeeTests_SkipDemo_DisplayName", Skip = "description here", Timeout = 10000)]
         [Fact]
         public void EmployeeTests_SkipDemo()
         {

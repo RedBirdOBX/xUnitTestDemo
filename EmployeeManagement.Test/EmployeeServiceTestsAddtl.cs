@@ -7,18 +7,20 @@ using EmployeeManagement.Test.Fixtures;
 
 namespace EmployeeManagement.Test
 {
-    // Class Fixture Approach //
-    // IClassFixture is used to share the same instance of the fixture class across all tests in the test class
-    // Instantiated before first test is fun and will auto-dispose once last test is run.
+    // Collection Fixture Approach //
+    // This test class is simply a duplicate of the EmployeeServiceTests class to illustrate that
+    // the ICollectionFixture can be shared among multiple classes: this one and the
+    // DataDrivenEmployeeServiceTests class.  The test (copied) in this class are not unique from the
+    // original class.
 
     [Collection("EmployeeServiceCollection")]
-    public class EmployeeServiceTests : IClassFixture<EmployeeServiceFixture>
+    public class EmployeeServiceTestsAddtl
     {
         private readonly Guid _firstCourseId = Guid.Parse("37e03ca7-c730-4351-834c-b66f280cdb01");
         private readonly Guid _secondCourseId = Guid.Parse("1fd115cf-f44c-4982-86bc-a8fe2e4ff83e");
         private readonly EmployeeServiceFixture _employeeServiceFixture;
 
-        public EmployeeServiceTests(EmployeeServiceFixture employeeServiceFixture)
+        public EmployeeServiceTestsAddtl(EmployeeServiceFixture employeeServiceFixture)
         {
             _employeeServiceFixture = employeeServiceFixture;
         }
