@@ -114,8 +114,14 @@ namespace EmployeeManagement.Test
 
         }
 
+        /// <summary>
+        /// Tests with api calls. using a custom message handler. creates a mock'd response for
+        /// httpClient to return.
+        /// https://app.pluralsight.com/ilx/video-courses/d1a07995-8bbd-4124-a48f-b1f7f672091e/6b302cf2-af84-45ef-a6b2-211b91629384/fb346498-0355-42d2-94ba-e4b36b97c3df
+        /// </summary>
+        /// <returns></returns>
         [Fact]
-        public async Task PromoteInternalEmployeeAsync_IsEligible_JobLevelMustBeIncreased() 
+        public async Task PromoteInternalEmployeeAsync_IsEligible_JobLevelMustBeIncreased()
         {
             // Arrange
             var httpClient = new HttpClient(new TestablePromotionEligibilityHandler(true));

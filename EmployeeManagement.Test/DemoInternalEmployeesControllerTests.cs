@@ -56,7 +56,6 @@ namespace EmployeeManagement.Test
             Assert.IsType<SerializableError>(badRequestResult.Value);
         }
 
-
         [Fact]
         public void GetProtectedInternalEmployees_GetActionForUserInAdminRole_MustRedirectToGetInternalEmployeesOnProtectedInternalEmployees()
         {

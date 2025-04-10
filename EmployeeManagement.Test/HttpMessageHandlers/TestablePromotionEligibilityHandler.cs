@@ -14,7 +14,9 @@ namespace EmployeeManagement.Test.HttpMessageHandlers
             _isEligibleForPromotion = isEligibleForPromotion;
         }
 
-        protected override Task<HttpResponseMessage> SendAsync( HttpRequestMessage request, CancellationToken cancellationToken)
+        // This SendAsync method is something we have overridden from the base HttpMessageHandler class.
+        // That means that we could mock that HttpMessageHandler and have it return what we want.
+        protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
         {
             // 1 - Create the object that will be part of the response
             // this is that the response body is deserialized to.
